@@ -1,39 +1,13 @@
 
 
 
-import React, { useState } from "react";
-import DownloadIcon from "@mui/icons-material/Download";
+import React from "react";
+
 import { useNavigate } from "react-router-dom";
 
 
 const Config = () => {
-  const [file, setFile] = useState(null);
-  const navigate = useNavigate();
 
-  // Handle the file selection
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
- 
-      setFile(selectedFile);
-    }
-  };
-  
-
-  // Function to handle file upload
-  const handleUploadClick = () => {
-    document.getElementById("fileInput").click();
-  };
-
-  // Function to upload file to the backend
-  const handleSubmit = async () => {
-    if (!file) {
-      alert("Please select a file before uploading.");
-      return;
-    }
-  
-    navigate("/upload/process-file");
-  };
   
 
   return (

@@ -1,10 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Generate from './Generate';
+import { useFileContext } from './FileContext';
 
 const GenerateContainer = () => {
   const navigate = useNavigate();
-
+  const { file } = useFileContext();
   // Function to handle the file upload logic
   const uploadFile = async (formData) => {
     try {
@@ -40,7 +41,7 @@ const GenerateContainer = () => {
   };
 
   return (
-    <Generate onButtonClick={handleButtonClick} />
+    <Generate onButtonClick={handleButtonClick} fileInput={file}/>
   );
 };
 

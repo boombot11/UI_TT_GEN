@@ -1,20 +1,21 @@
 import React, { useState } from "react";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useFileContext } from "./FileContext";
 
 const Upload = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
-
+  const { File,handleFileChange } = useFileContext(); 
   // Handle the file selection
-  const handleFileChange = (e) => {
+  const handleFile = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
- 
+      handleFileChange(selectedFile); // Save the selected file in context
+    }
       setFile(selectedFile);
     }
-  };
+  
   
 
   // Function to handle file upload
@@ -24,12 +25,17 @@ const Upload = () => {
 
   // Function to upload file to the backend
   const handleSubmit = async () => {
+
     if (!file) {
+      if(File){
+        navigate("/config");
+        return
+      }
       alert("Please select a file before uploading.");
       return;
     }
   
-    navigate("/upload/process-file");
+    navigate("/config");
   };
   
 
@@ -87,7 +93,7 @@ const Upload = () => {
               id="fileInput"
               type="file"
 
-              onChange={handleFileChange}
+              onChange={handleFile}
               className="hidden"
             />
             <p className="text-gray-400 text-sm mt-3">Upload Only Excel</p>

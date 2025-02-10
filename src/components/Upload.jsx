@@ -6,17 +6,16 @@ import { useFileContext } from "./FileContext";
 const Upload = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
-  const { File,handleFileChange } = useFileContext(); 
+  const { File, handleFileChange } = useFileContext(); 
+  
   // Handle the file selection
   const handleFile = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
       handleFileChange(selectedFile); // Save the selected file in context
     }
-      setFile(selectedFile);
-    }
-  
-  
+    setFile(selectedFile);
+  };
 
   // Function to handle file upload
   const handleUploadClick = () => {
@@ -25,19 +24,23 @@ const Upload = () => {
 
   // Function to upload file to the backend
   const handleSubmit = async () => {
-
     if (!file) {
-      if(File){
+      if (File) {
         navigate("/config");
-        return
+        return;
       }
       alert("Please select a file before uploading.");
       return;
     }
-  
+
     navigate("/config");
   };
-  
+
+  // Function to remove the selected file
+  const handleRemoveFile = () => {
+    setFile(null); // Clear the file state
+    handleFileChange(null); // Clear the context file
+  };
 
   return (
     <>
@@ -92,11 +95,24 @@ const Upload = () => {
             <input
               id="fileInput"
               type="file"
-
               onChange={handleFile}
               className="hidden"
             />
             <p className="text-gray-400 text-sm mt-3">Upload Only Excel</p>
+
+            {/* File Display Section */}
+            {file && (
+              <div className="flex items-center space-x-2 mt-4 bg-gray-900/60 p-3 rounded-lg">
+                <span className="text-white">{file.name}</span>
+                <button
+                  onClick={handleRemoveFile}
+                  className="text-red-500 hover:text-red-700 absolute right-10 font-bold"
+                >
+                  ✖
+                </button>
+              </div>
+            )}
+
             <button
               onClick={handleSubmit}
               className="px-3 py-2 bg-indigo-600 text-white border-none rounded-lg mt-5 font-semibold hover:bg-indigo-600/70"

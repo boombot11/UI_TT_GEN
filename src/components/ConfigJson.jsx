@@ -25,13 +25,55 @@ const KeyValueInput = ({ keyValuePairs, handleInputChange, handleAddInput, handl
   });
 
   return (
-    <div>
+    <div
+      style={{
+        maxHeight: "60vh",
+        backdropFilter:"blur(10px)",
+        width:"100vh", // Set height to 40% of the screen height
+        overflowY: "auto", // Make it scrollable if content exceeds the height
+        padding: "1rem", // Add padding for better spacing
+        
+        borderRadius: "1rem", // Rounded corners for the container
+      
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", // Box shadow for some depth
+      }}
+    >
       {keyValuePairs.map((pair, index) => (
-        <div key={index} style={{ backgroundColor: "#1f2937", display: "flex", width: "100%", padding: "2rem", borderRadius: "1rem", marginBottom: "1rem", border: "1px solid #6b7280", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-          <div style={{ display: "flex", flexDirection: "column", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-            <p style={{ color: "#e5e7eb", width: "100%" }}>Key-Value Pair {index + 1}</p>
+        <div
+          key={index}
+          style={{
+            backgroundColor: "#1f2937",
+            display: "flex",
+            width: "100%",
+            padding: "2rem",
+            borderRadius: "1rem",
+            marginBottom: "1rem",
+            border: "1px solid #6b7280",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: "100%",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <p style={{ color: "#e5e7eb", width: "100%" }}>
+              Name full forms submission {index + 1}
+            </p>
 
-            <div style={{ display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center", gap: "0.25rem" }}>
+            <div
+              style={{
+                display: "flex",
+                width: "100%",
+                justifyContent: "space-between",
+                alignItems: "center",
+                gap: "0.25rem",
+              }}
+            >
               <input
                 type="text"
                 value={pair.key}
@@ -56,7 +98,15 @@ const KeyValueInput = ({ keyValuePairs, handleInputChange, handleAddInput, handl
           </div>
         </div>
       ))}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "1rem" }}>
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "1rem",
+        }}
+      >
         <button
           onClick={handleAddInput}
           style={buttonStyle("#4f46e5")} // bg-indigo-600
@@ -65,17 +115,56 @@ const KeyValueInput = ({ keyValuePairs, handleInputChange, handleAddInput, handl
         </button>
         <button
           onClick={handleSubmit}
-          style={buttonStyle("#10b981")} // bg-green-600
+          style={buttonStyle("#4f46e5")} // bg-indigo-600
         >
-          Submit (Export as JSON)
+          Save Changes
         </button>
       </div>
     </div>
   );
 };
 
+// Add the custom scrollbar styles
+const customScrollbarStyles = `
+  /* Custom Scrollbar for the KeyValueInput container */
+  div[style*="overflow-y: auto"] {
+    scrollbar-width: thin;
+    scrollbar-color: #4f46e5 #1f2937; /* thumb and track color */
+  }
+
+  div[style*="overflow-y: auto"]::-webkit-scrollbar {
+    width: 8px; /* Slimmer scrollbar */
+  }
+
+  div[style*="overflow-y: auto"]::-webkit-scrollbar-thumb {
+    background-color: #4f46e5; /* Blue thumb */
+    border-radius: 8px;
+  }
+
+  div[style*="overflow-y: auto"]::-webkit-scrollbar-track {
+    background-color: #1f2937; /* Track background */
+    border-radius: 8px;
+  }
+
+  div[style*="overflow-y: auto"]::-webkit-scrollbar-button {
+    background-color: #4f46e5; /* Button color (if any) */
+    display: none; /* Hide button */
+  }
+`;
+
+// Insert custom scrollbar styles into the document head
+const insertCustomScrollbarStyles = () => {
+  const styleTag = document.createElement('style');
+  styleTag.innerHTML = customScrollbarStyles;
+  document.head.appendChild(styleTag);
+};
+
+// Automatically insert the custom styles on component mount
+insertCustomScrollbarStyles();
+
+
 // Main Component
-const KeyValueComponent = () => {
+const KeyValueComponent = ({onKeySubmit}) => {
   const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
 
   const handleInputChange = (index, field, value) => {
@@ -97,8 +186,9 @@ const KeyValueComponent = () => {
       }
       return acc;
     }, {});
-
-    console.log('JSON Output:', jsonOutput);
+console.log('finalllllllllllllllllllll');
+console.log(jsonOutput);
+   onKeySubmit(jsonOutput);
   };
 
   return (

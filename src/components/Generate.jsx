@@ -11,7 +11,7 @@ const Generate = ({ onButtonClick,fileInput }) => {
   const [configInput, ChangeconfigInput] = useState(null);
   const [classrooms, ChangeClassrooms] = useState("");
   const [labs, ChangeLabs] = useState("");
-
+  const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
   // Manage state for each circle's status (on/off)
   const [circles, setCircles] = useState([false, false, false, false]);
 
@@ -99,7 +99,9 @@ const Generate = ({ onButtonClick,fileInput }) => {
             handleAddInput={handleAddInput} 
           />}
           {/*adding config Button*/
-       <KeyValueComponent></KeyValueComponent>
+       <KeyValueComponent
+       onKeySubmit={setKeyValuePairs}
+       ></KeyValueComponent>
           }
           {/* Generate Button */}
           <button

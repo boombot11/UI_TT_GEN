@@ -14,6 +14,8 @@ const Upload = () => {
     if (selectedFile) {
       handleFileChange(selectedFile); // Save the selected file in context
     }
+    console.log('file selected')
+    console.log(selectedFile)
     setFile(selectedFile);
   };
 

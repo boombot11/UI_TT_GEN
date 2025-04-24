@@ -5,7 +5,10 @@ import { useFileContext } from './FileContext';
 
 const GenerateContainer = () => {
   const navigate = useNavigate();
-  const { file } = useFileContext();
+  console.log('at the start');
+  const { File } = useFileContext();
+  console.log('filed added');
+  console.log(File)
   // Function to handle the file upload logic
   const uploadFile = async (formData) => {
     try {
@@ -41,7 +44,7 @@ const GenerateContainer = () => {
   };
 
   return (
-    <Generate onButtonClick={handleButtonClick} fileInput={file}/>
+    <Generate onButtonClick={handleButtonClick} fileInput={File}/>
   );
 };
 

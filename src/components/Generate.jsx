@@ -15,17 +15,40 @@ const Generate = ({ onButtonClick,fileInput }) => {
   // Manage state for each circle's status (on/off)
   const [circles, setCircles] = useState([false, false, false, false]);
 
+const changeConfig=(File)=>{
+ChangeconfigInput(File);
+console.log('config file ADDED');
+console.log(File);
+}
+
   // State for extra add-ons
   const [addOns, setAddOns] = useState([{ content: '', time: '', sheetName: '', day: '' }]);
 
   const handleButtonClick = async () => {
     const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-    formData.append("config", configInput.files[0]);
+    const configData = {
+      "NK": "Neha Katre",
+      "ARJ": "Arya Ram Joshi",
+      "PT": "Private",
+      "RM": "ram",
+      "AKS": "Ak-----------------------47",
+      "RS": "muten roshi",
+      "MM": "matchmaking"
+  };
+  
+    console.log('at the start of generate');
+   
+    console.log('fileinput');
+    console.log(fileInput);
+    console.log('config file');
+    console.log(configInput)
+    formData.append('config_data', JSON.stringify(configData));
+    formData.append("file", fileInput);
+    formData.append("config", configInput);
     formData.append("classrooms", classrooms);
     formData.append("labs", labs);
-    formData.append("header", headerInput.files[0]);
-    formData.append("footer", footerInput.files[0]);
+    formData.append("header", headerInput);
+    formData.append("footer", footerInput);
 
     // Append extra add-ons to formData
 
@@ -98,6 +121,7 @@ const Generate = ({ onButtonClick,fileInput }) => {
             handleInputChange={handleInputChange} 
             handleAddInput={handleAddInput} 
           />}
+          <ConfigInput  click={changeConfig} label="Enter your config json file" placeholder="" />
           {/*adding config Button*/
        <KeyValueComponent
        onKeySubmit={setKeyValuePairs}
@@ -134,6 +158,59 @@ const InputSection = ({ label, placeholder ,onClick}) => {
     </div>
   );
 };
+
+
+const ConfigInput = ({ click,label, placeholder }) => {
+  const divStyle = {
+    backgroundColor: 'rgba(31, 41, 55, 0.9)', // bg-gray-800/90
+    display: 'flex',
+    width: '100%',
+    maxWidth: '60vh',
+    borderWidth: '1px',
+    borderColor: '#6b7280', // border-gray-500
+    padding: '2rem', // p-8
+    borderRadius: '0.75rem', // rounded-lg
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-xl
+    position: 'relative',
+    zIndex: 10
+  };
+
+  const textStyle = {
+    color: '#e5e7eb', // text-white
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '1.25rem', // pl-5
+    marginTop: '1rem', // mt-4
+    borderWidth: '1px',
+    borderColor: '#4b5563', // border-gray-600
+    borderRadius: '0.5rem', // rounded-lg
+    backgroundColor: 'rgba(31, 41, 55, 0.8)', // bg-gray-900/80
+
+    opacity: 0.6 // placeholder:opacity-60
+  };
+
+  return (
+    <div style={divStyle}>
+      <div style={textStyle}>
+        <p style={{ color: '#e5e7eb' }}>{label}</p>
+        <input
+          type="file"
+          placeholder={placeholder}
+          onChange={(e)=>click(e.target.files[0])}
+          style={inputStyle}
+        />
+      </div>
+    </div>
+  );
+};
+
 
 const HeaderInput = ({ label, placeholder }) => {
   const divStyle = {

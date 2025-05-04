@@ -8,12 +8,11 @@ import GenerateContainer from './components/Form.';
 import ModifyConfig from './components/config';
 import { FileProvider } from './components/FileContext';
 import { FormDataProvider } from './components/FormDataContext';
-import FormDataTest from './components/TestPage';
 
 function App() {
   return (
   <>
-  {/* <Navbar/>
+  <Navbar/>
   <FormDataProvider>
   <FileProvider>
       <BrowserRouter>
@@ -26,8 +25,7 @@ function App() {
         </Routes>
       </BrowserRouter>
     </FileProvider>
-    </FormDataProvider> */}
-    <FormDataTest></FormDataTest>
+    </FormDataProvider>
   </>
   );
 }

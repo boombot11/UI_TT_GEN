@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Key-Value Input Component
 const KeyValueInput = ({ keyValuePairs, handleInputChange, handleAddInput, handleSubmit }) => {
@@ -163,20 +163,36 @@ const insertCustomScrollbarStyles = () => {
 insertCustomScrollbarStyles();
 
 
-// Main Component
-const KeyValueComponent = ({onKeySubmit}) => {
+const KeyValueComponent = ({ keyValuePairsConfig, onKeySubmit }) => {
+  console.log('🟡 [INIT] Received keyValuePairsConfig:', keyValuePairsConfig);
+
   const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
 
+  // Sync state when keyValuePairsConfig updates
+  useEffect(() => {
+    if (
+      keyValuePairsConfig &&
+      typeof keyValuePairsConfig === 'object' &&
+      !Array.isArray(keyValuePairsConfig)
+    ) {
+      const pairs = Object.entries(keyValuePairsConfig)
+        .filter(([key, value]) => typeof key !== 'object' && typeof value !== 'object')
+        .map(([key, value]) => ({ key, value }));
+      console.log('🟢 [EFFECT] Updating keyValuePairs state from config:', pairs);
+      setKeyValuePairs(pairs);
+    }
+  }, [keyValuePairsConfig]);
+
   const handleInputChange = (index, field, value) => {
-    console.log(`Input changed for ${field} at index ${index}:`, value);
     const updatedPairs = [...keyValuePairs];
     updatedPairs[index][field] = value;
     setKeyValuePairs(updatedPairs);
+    console.log('🧩 [STATE] Updated keyValuePairs after change:', updatedPairs);
   };
 
   const handleAddInput = () => {
-    console.log("Adding new key-value pair");
-    setKeyValuePairs([...keyValuePairs, { key: '', value: '' }]);
+    const updated = [...keyValuePairs, { key: '', value: '' }];
+    setKeyValuePairs(updated);
   };
 
   const handleSubmit = () => {
@@ -186,9 +202,7 @@ const KeyValueComponent = ({onKeySubmit}) => {
       }
       return acc;
     }, {});
-console.log('finalllllllllllllllllllll');
-console.log(jsonOutput);
-   onKeySubmit(jsonOutput);
+    onKeySubmit(jsonOutput);
   };
 
   return (

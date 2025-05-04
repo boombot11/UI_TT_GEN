@@ -146,6 +146,8 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
           {circles[2] && <HeaderInput onClick={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
           {circles[3] && (
             <ExtraAddOnInput 
+            classes={classrooms}
+            lab={labs}
               addOns={addOns} 
               handleInputChange={handleInputChange} 
               handleAddInput={handleAddInput} 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExtraAddOnInput } from './AddOn';
 import KeyValueComponent from './ConfigJson';
+import { useFormData } from './FormDataContext';
 const Generate = ({ onButtonClick,fileInput }) => {
   const navigate = useNavigate();
 
@@ -9,6 +10,7 @@ const Generate = ({ onButtonClick,fileInput }) => {
   const [headerInput, ChangeheaderInput] = useState(null);
   const [footerInput, ChangefooterInput] = useState(null);
   const [configInput, ChangeconfigInput] = useState(null);
+  const { storeFormData } = useFormData();
   const [classrooms, ChangeClassrooms] = useState("");
   const [labs, ChangeLabs] = useState("");
   const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
@@ -26,23 +28,29 @@ console.log(File);
 
   const handleButtonClick = async () => {
     const formData = new FormData();
-    const configData = {
-      "NK": "Neha Katre",
-      "ARJ": "Arya Ram Joshi",
-      "PT": "Private",
-      "RM": "ram",
-      "AKS": "Ak-----------------------47",
-      "RS": "muten roshi",
-      "MM": "matchmaking"
-  };
+  //   const configData = {
+  //     "NK": "Neha Katre",
+  //     "ARJ": "Arya Ram Joshi",
+  //     "PT": "Private",
+  //     "RM": "ram",
+  //     "AKS": "Ak-----------------------47",
+  //     "RS": "muten roshi",
+  //     "MM": "matchmaking"
+  // };
   
     console.log('at the start of generate');
    
     console.log('fileinput');
     console.log(fileInput);
     console.log('config file');
-    console.log(configInput)
-    formData.append('config_data', JSON.stringify(configData));
+    console.log(keyValuePairs)
+    formData.append('config_data', JSON.stringify(keyValuePairs));
+    console.log('AddOns  !!!  ');
+    addOns.forEach((value)=>{
+      console.log(value);
+    })
+    console.log(classrooms)
+    console.log(labs)
     formData.append("file", fileInput);
     formData.append("config", configInput);
     formData.append("classrooms", classrooms);
@@ -53,7 +61,7 @@ console.log(File);
     // Append extra add-ons to formData
 
  formData.append("addOns", JSON.stringify(addOns));
-    onButtonClick(formData);
+     onButtonClick(formData);
   };
 
   // Toggle the status of a specific circle
@@ -121,7 +129,7 @@ console.log(File);
             handleInputChange={handleInputChange} 
             handleAddInput={handleAddInput} 
           />}
-          <ConfigInput  click={changeConfig} label="Enter your config json file" placeholder="" />
+          {/* <ConfigInput  click={changeConfig} label="Enter your config json file" placeholder="" /> */}
           {/*adding config Button*/
        <KeyValueComponent
        onKeySubmit={setKeyValuePairs}
@@ -151,6 +159,7 @@ const InputSection = ({ label, placeholder ,onClick}) => {
         <p className="text-gray-200 w-full">{label}</p>
         <input
           type="text"
+          onChange={(e) => onClick(e.target.value)}
           placeholder={placeholder}
           className="w-full pl-5 mt-4 border-gray-600 rounded-lg bg-gray-900/80 h-10 placeholder:opacity-60"
         />

@@ -7,10 +7,12 @@ import { useFormData } from './FormDataContext';
 
 const Generate = ({ onButtonClick, fileInput, configData = null }) => {
   const navigate = useNavigate();
-
+ const [loader,Setloader]=useState(false);
   const [headerInput, ChangeheaderInput] = useState(null);
   const [footerInput, ChangefooterInput] = useState(null);
   const [configInput, ChangeconfigInput] = useState(null);
+  const [selectedDept, setSelectedDept] = useState('');
+
   const { storeFormData } = useFormData();
   const [classrooms, ChangeClassrooms] = useState('');
   const [labs, ChangeLabs] = useState('');
@@ -46,20 +48,31 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
   };
 
   const handleButtonClick = async () => {
+  if ( !selectedDept==='') {
+  alert("Please select a Department or upload both Header and Footer files.");
+  return;
+}
+
     const formData = new FormData();
     formData.append('config_data', JSON.stringify(keyValuePairs));
     formData.append('file', fileInput);
     formData.append('config', configInput);
     formData.append('classrooms', classrooms);
     formData.append('labs', labs);
-    formData.append('header', headerInput);
-    formData.append('footer', footerInput);
+    formData.append('HEADER', headerInput);
+    formData.append('FOOTER', footerInput);
+    formData.append('Department', selectedDept);
+
     formData.append('addOns', JSON.stringify(addOns));
 
     onButtonClick(formData);
   };
 
   const handleSaveConfig = async () => {
+    if (!selectedDept==='') {
+  alert("Please select a Department or upload both Header and Footer files.");
+  return;
+    }
     const title = prompt('Enter a title for this config:');
     if (!title) {
       alert('Title is required to save the config.');
@@ -69,6 +82,7 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
     const formData = {
       keyValuePairs,
       classrooms,
+      selectedDept,
       labs,
       addOns,
     };
@@ -90,6 +104,14 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
       alert('An error occurred while saving the config.');
     }
   };
+
+const GenerateFile=()=>{
+  if(loader===true)
+    return;
+  Setloader(true);
+  handleButtonClick();
+
+}
 
   const toggleCircle = (index) => {
     const updatedCircles = [...circles];
@@ -153,6 +175,26 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
               handleAddInput={handleAddInput} 
             />
           )}
+{(1) && (
+  <div className="w-full px-6">
+    <label className="block text-white mb-1 text-lg py-4">
+      Select Department <span className="text-red-400">*</span>
+    </label>
+    <select
+      value={selectedDept}
+      onChange={(e) => setSelectedDept(e.target.value)}
+      className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+    >
+      <option value="">-- Choose Department --</option>
+      <option value="IT">IT</option>
+      <option value="CS">CS</option>
+      <option value="EXTC">EXTC</option>
+    </select>
+    <p className="text-gray-400 text-lg mt-1 py-3">
+      Default header and footer of selected department will be used
+    </p>
+  </div>
+)}
 
   <KeyValueComponent 
   keyValuePairsConfig={keyValuePairs} 
@@ -161,18 +203,18 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
 
           <div className="flex space-x-4">
             <button
-              onClick={handleButtonClick}
+              onClick={GenerateFile}
               className="px-10 border border-white/20 py-2 bg-indigo-600 text-white font-semibold rounded-lg mt-5 hover:bg-indigo-500"
             >
-              Generate
+              {!loader?"Generate":"Loading..."}
             </button>
 
-            <button
+           {!loader? <button
               onClick={handleSaveConfig}
               className="px-10 border border-white/20 py-2 bg-gray-700 text-white font-semibold rounded-lg mt-5 hover:bg-gray-600"
             >
               Save Config
-            </button>
+            </button>:<></>}
           </div>
         </div>
       </div>

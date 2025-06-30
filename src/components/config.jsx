@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { TrashIcon } from "@heroicons/react/outline"; // Import Heroicon Trash icon
 
 const Config = () => {
   return (
@@ -27,14 +28,11 @@ const ModifyConfig = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const CustomClickHandler = () => {
-    navigate("/upload/process-file");
-  };
-
+  // Fetch configs when component mounts
   useEffect(() => {
     const fetchConfigs = async () => {
       try {
-        const response = await fetch("getForm"); // Update this endpoint if needed
+        const response = await fetch("getForm");
         if (!response.ok) {
           throw new Error("Failed to fetch config data");
         }
@@ -50,6 +48,36 @@ const ModifyConfig = () => {
 
     fetchConfigs();
   }, []);
+
+  // Handle click to navigate to a specific config process
+  const handleConfigClick = (configTitle) => {
+    navigate(`/upload/process-file/?title=${configTitle}`);
+  };
+
+  // Handle deleting the config
+  const handleDeleteConfig = async (configTitle) => {
+    try {
+      const response = await fetch("/deleteForm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ title: configTitle }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete config");
+      }
+
+      // Remove the deleted config from the UI state
+      setConfigs((prevConfigs) =>
+        prevConfigs.filter((config) => config.title !== configTitle)
+      );
+    } catch (err) {
+      console.error("Error deleting config:", err);
+      setError("Could not delete the config.");
+    }
+  };
 
   return (
     <div className="bg-gray-800/90 w-full md:w-[95%] lg:w-[80%] border border-gray-500 p-8 rounded-lg shadow-xl relative z-10 flex flex-col items-center">
@@ -67,11 +95,22 @@ const ModifyConfig = () => {
           configs.map((config, index) => (
             <div
               key={index}
-              onClick={() => navigate(`/upload/process-file/?title=${config.title}`)}
-
-              className="bg-gray-700/90 text-center p-4 rounded-lg shadow-lg border-2 border-gray-600 flex-1 min-w-[200px]"
+              className="bg-gray-700/90 text-center p-4 rounded-lg shadow-lg border-2 border-gray-600 flex-1 min-w-[200px] relative"
             >
-              <p className="text-white">{config.title}</p>
+              <p
+                onClick={() => handleConfigClick(config.title)}
+                className="text-white cursor-pointer"
+              >
+                {config.title}
+              </p>
+
+              {/* Delete Icon */}
+              <button
+                onClick={() => handleDeleteConfig(config.title)}
+                className="absolute top-2 right-2 text-gray-400 hover:text-red-500"
+              >
+                <TrashIcon className="w-5 h-5" />
+              </button>
             </div>
           ))
         )}
@@ -79,7 +118,7 @@ const ModifyConfig = () => {
 
       {/* Custom Config Button */}
       <button
-        onClick={CustomClickHandler}
+        onClick={() => navigate("/upload/process-file")}
         className="px-8 py-2 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-500 mt-4"
       >
         Custom Config

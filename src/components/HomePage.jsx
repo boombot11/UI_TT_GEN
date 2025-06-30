@@ -14,7 +14,7 @@ const HomePage = () => {
 
       {/* Main Content Section */}
       <div className="flex flex-col items-center justify-center text-center text-white space-y-8 relative z-10">
-        <h1 className="text-4xl font-bold">Generate Your TimeTable</h1>
+        <h className="text-4xl font-bold">Generate Your TimeTable</h>
         <p className="text-lg">Create your weekly schedule in a few simple steps</p>
         <a href="/upload" className="px-8 py-4 bg-white hover:bg-white/70 hover:text-black text-black font-bold rounded-lg shadow-md transition duration-300">
           Start Creating

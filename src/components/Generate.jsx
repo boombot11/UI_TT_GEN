@@ -52,7 +52,8 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
   alert("Please select a Department or upload both Header and Footer files.");
   return;
 }
-
+  console.log("Header Input:", headerInput);  // Log header input
+  console.log("Footer Input:", footerInput);  // Log footer input
     const formData = new FormData();
     formData.append('config_data', JSON.stringify(keyValuePairs));
     formData.append('file', fileInput);
@@ -62,7 +63,6 @@ const Generate = ({ onButtonClick, fileInput, configData = null }) => {
     formData.append('HEADER', headerInput);
     formData.append('FOOTER', footerInput);
     formData.append('Department', selectedDept);
-
     formData.append('addOns', JSON.stringify(addOns));
 
     onButtonClick(formData);
@@ -163,8 +163,8 @@ const GenerateFile=()=>{
             value={labs}
           />
 
-          {circles[0] && <HeaderInput onClick={ChangeheaderInput} label="Input the header file" placeholder="" />}
-          {circles[1] && <HeaderInput onClick={ChangefooterInput} label="Input the Footer file" placeholder="" />}
+          {circles[0] && <HeaderInput onChange={ChangeheaderInput} label="Input the header file" placeholder="" />}
+          {circles[1] && <HeaderInput onChange={ChangefooterInput} label="Input the Footer file" placeholder="" />}
           {circles[2] && <HeaderInput onClick={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
           {circles[3] && (
             <ExtraAddOnInput 
@@ -296,7 +296,14 @@ const ConfigInput = ({ click,label, placeholder }) => {
 };
 
 
-const HeaderInput = ({ label, placeholder }) => {
+const HeaderInput = ({onChange, label, placeholder }) => {
+
+   const handleFileChange = (e) => {
+    const file = e.target.files[0]; // Get the first file selected
+    onChange(file); // Update the parent state with the selected file
+  };
+
+
   const divStyle = {
     backgroundColor: 'rgba(31, 41, 55, 0.9)', // bg-gray-800/90
     display: 'flex',
@@ -337,6 +344,7 @@ const HeaderInput = ({ label, placeholder }) => {
       <div style={textStyle}>
         <p style={{ color: '#e5e7eb' }}>{label}</p>
         <input
+         onChange={handleFileChange}
           type="file"
           placeholder={placeholder}
           style={inputStyle}

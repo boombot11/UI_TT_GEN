@@ -165,7 +165,7 @@ const GenerateFile=()=>{
 
           {circles[0] && <HeaderInput onChange={ChangeheaderInput} label="Input the header file" placeholder="" />}
           {circles[1] && <HeaderInput onChange={ChangefooterInput} label="Input the Footer file" placeholder="" />}
-          {circles[2] && <HeaderInput onClick={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
+          {circles[2] && <HeaderInput onChange={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
           {circles[3] && (
             <ExtraAddOnInput 
             classes={classrooms}

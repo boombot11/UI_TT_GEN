@@ -1,51 +1,128 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ExtraAddOnInput } from './AddOn';
 import KeyValueComponent from './ConfigJson';
-const Generate = ({ onButtonClick,fileInput }) => {
+import { useFormData } from './FormDataContext';
+
+
+const Generate = ({ onButtonClick, fileInput, configData = null }) => {
   const navigate = useNavigate();
-
-
+ const [loader,Setloader]=useState(false);
   const [headerInput, ChangeheaderInput] = useState(null);
   const [footerInput, ChangefooterInput] = useState(null);
   const [configInput, ChangeconfigInput] = useState(null);
-  const [classrooms, ChangeClassrooms] = useState("");
-  const [labs, ChangeLabs] = useState("");
-  const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
-  // Manage state for each circle's status (on/off)
-  const [circles, setCircles] = useState([false, false, false, false]);
+  const [selectedDept, setSelectedDept] = useState('');
 
-  // State for extra add-ons
+  const { storeFormData } = useFormData();
+  const [classrooms, ChangeClassrooms] = useState('');
+  const [labs, ChangeLabs] = useState('');
+  const [keyValuePairs, setKeyValuePairs] = useState([{ key: '', value: '' }]);
+  const [circles, setCircles] = useState([false, false, false, false]);
   const [addOns, setAddOns] = useState([{ content: '', time: '', sheetName: '', day: '' }]);
 
+  // Auto-fill config data
+  useEffect(() => {
+    if (configData) {
+      if (configData.keyValuePairs) {
+        console.log('xxx')
+        console.log(configData.keyValuePairs)
+        setKeyValuePairs(configData.keyValuePairs);
+      }
+      if (configData.classrooms) ChangeClassrooms(configData.classrooms);
+      if (configData.labs) ChangeLabs(configData.labs);
+      if (configData.addOns) setAddOns(configData.addOns);
+      if (configData.addOns) {
+        setCircles(prevCircles => {
+          const newCircles = [...prevCircles]; // Make a copy of the current circles
+          newCircles[3] = true; // Set the 4th circle (index 3) to true
+          return newCircles; // Return the updated array
+        });
+      }
+      
+      
+    }
+  }, [configData]);
+
+  const changeConfig = (File) => {
+    ChangeconfigInput(File);
+  };
+
   const handleButtonClick = async () => {
+  if ( !selectedDept==='') {
+  alert("Please select a Department or upload both Header and Footer files.");
+  return;
+}
+  console.log("Header Input:", headerInput);  // Log header input
+  console.log("Footer Input:", footerInput);  // Log footer input
     const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-    formData.append("config", configInput.files[0]);
-    formData.append("classrooms", classrooms);
-    formData.append("labs", labs);
-    formData.append("header", headerInput.files[0]);
-    formData.append("footer", footerInput.files[0]);
+    formData.append('config_data', JSON.stringify(keyValuePairs));
+    formData.append('file', fileInput);
+    formData.append('config', configInput);
+    formData.append('classrooms', classrooms);
+    formData.append('labs', labs);
+    formData.append('HEADER', headerInput);
+    formData.append('FOOTER', footerInput);
+    formData.append('Department', selectedDept);
+    formData.append('addOns', JSON.stringify(addOns));
 
-    // Append extra add-ons to formData
-
- formData.append("addOns", JSON.stringify(addOns));
     onButtonClick(formData);
   };
 
-  // Toggle the status of a specific circle
+  const handleSaveConfig = async () => {
+    if (!selectedDept==='') {
+  alert("Please select a Department or upload both Header and Footer files.");
+  return;
+    }
+    const title = prompt('Enter a title for this config:');
+    if (!title) {
+      alert('Title is required to save the config.');
+      return;
+    }
+
+    const formData = {
+      keyValuePairs,
+      classrooms,
+      selectedDept,
+      labs,
+      addOns,
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/saveForm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, formData }),
+      });
+
+      if (response.ok) {
+        alert('Config saved successfully!');
+      } else {
+        alert('Failed to save config.');
+      }
+    } catch (err) {
+      console.error('Error saving config:', err);
+      alert('An error occurred while saving the config.');
+    }
+  };
+
+const GenerateFile=()=>{
+  if(loader===true)
+    return;
+  Setloader(true);
+  handleButtonClick();
+
+}
+
   const toggleCircle = (index) => {
     const updatedCircles = [...circles];
     updatedCircles[index] = !updatedCircles[index];
     setCircles(updatedCircles);
   };
 
-  // Add more extra add-ons input fields
   const handleAddInput = () => {
     setAddOns([...addOns, { content: '', time: '', sheetName: '', day: '' }]);
   };
 
-  // Handle input change for extra add-ons
   const handleInputChange = (index, field, value) => {
     const updatedAddOns = [...addOns];
     updatedAddOns[index][field] = value;
@@ -54,16 +131,11 @@ const Generate = ({ onButtonClick,fileInput }) => {
 
   return (
     <div>
-      {/* Background Shapes (Fixed) */}
-      <div className="fixed top-0 left-0 w-full h-full overflow-hidden">
-        {/* (Background shapes unchanged) */}
-      </div>
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden"></div>
 
-      {/* Main Content */}
       <div className="min-h-screen bg-gradient-to-r from-gray-900 via-indigo-900 to-black flex items-center justify-center py-10">
         <div className="relative flex mt-20 flex-col justify-center w-full max-w-3xl space-y-10 items-center">
           
-          {/* Row of Circles with White Border and Descriptions */}
           <div className="flex space-x-8 mb-8">
             {circles.map((status, index) => (
               <div key={index} className="flex flex-col items-center">
@@ -78,38 +150,72 @@ const Generate = ({ onButtonClick,fileInput }) => {
             ))}
           </div>
 
-          {/* Render Input Sections Based on Circle Toggle */}
           <InputSection 
             onClick={ChangeClassrooms}
             label="Input classroom numbers whose time table is to be generated" 
             placeholder="Eg. 64, 65, 66..." 
+            value={classrooms}
           />
           <InputSection  
             onClick={ChangeLabs}
             label="Input Lab names whose time table is to be generated" 
             placeholder="Eg. L1, L2, L3..." 
+            value={labs}
           />
 
-          {circles[0] && <HeaderInput onClick={ChangeheaderInput} label="Input the header file" placeholder="" />}
-          {circles[1] && <HeaderInput onClick={ChangefooterInput} label="Input the Footer file" placeholder="" />}
-          {circles[2] && <HeaderInput onClick={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
-          {circles[3] && <ExtraAddOnInput 
-            addOns={addOns} 
-            handleInputChange={handleInputChange} 
-            handleAddInput={handleAddInput} 
-          />}
-          {/*adding config Button*/
-       <KeyValueComponent
-       onKeySubmit={setKeyValuePairs}
-       ></KeyValueComponent>
-          }
-          {/* Generate Button */}
-          <button
-            onClick={handleButtonClick}
-            className="px-10 border border-white/20 py-2 bg-indigo-600 text-white font-semibold rounded-lg mt-5 hover:bg-indigo-500"
-          >
-            Generate
-          </button>
+          {circles[0] && <HeaderInput onChange={ChangeheaderInput} label="Input the header file" placeholder="" />}
+          {circles[1] && <HeaderInput onChange={ChangefooterInput} label="Input the Footer file" placeholder="" />}
+          {circles[2] && <HeaderInput onChange={ChangeconfigInput} label="Enter your config json file" placeholder="" />}
+          {circles[3] && (
+            <ExtraAddOnInput 
+            classes={classrooms}
+            lab={labs}
+              addOns={addOns} 
+              handleInputChange={handleInputChange} 
+              handleAddInput={handleAddInput} 
+            />
+          )}
+{(1) && (
+  <div className="w-full px-6">
+    <label className="block text-white mb-1 text-lg py-4">
+      Select Department <span className="text-red-400">*</span>
+    </label>
+    <select
+      value={selectedDept}
+      onChange={(e) => setSelectedDept(e.target.value)}
+      className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+    >
+      <option value="">-- Choose Department --</option>
+      <option value="IT">IT</option>
+      <option value="CS">CS</option>
+      <option value="EXTC">EXTC</option>
+    </select>
+    <p className="text-gray-400 text-lg mt-1 py-3">
+      Default header and footer of selected department will be used
+    </p>
+  </div>
+)}
+
+  <KeyValueComponent 
+  keyValuePairsConfig={keyValuePairs} 
+  onKeySubmit={setKeyValuePairs} 
+   />
+
+          <div className="flex space-x-4">
+            <button
+              onClick={GenerateFile}
+              className="px-10 border border-white/20 py-2 bg-indigo-600 text-white font-semibold rounded-lg mt-5 hover:bg-indigo-500"
+            >
+              {!loader?"Generate":"Loading..."}
+            </button>
+
+           {!loader? <button
+              onClick={handleSaveConfig}
+              className="px-10 border border-white/20 py-2 bg-gray-700 text-white font-semibold rounded-lg mt-5 hover:bg-gray-600"
+            >
+              Save Config
+            </button>:<></>}
+          </div>
         </div>
       </div>
     </div>
@@ -119,23 +225,26 @@ const Generate = ({ onButtonClick,fileInput }) => {
 export default Generate;
 
 
+const InputSection = ({ label, placeholder, onClick, value }) => {
+  const handleChange = (e) => {
+    onClick(e.target.value);
+  };
 
-const InputSection = ({ label, placeholder ,onClick}) => {
   return (
-    <div className="bg-gray-800/90 flex w-full md:w-[95%] lg:w-[80%]  border border-gray-500 p-8 rounded-lg shadow-xl relative z-10">
-      <div className="text-white flex flex-col w-full justify-between items-center">
-        <p className="text-gray-200 w-full">{label}</p>
-        <input
-          type="text"
-          placeholder={placeholder}
-          className="w-full pl-5 mt-4 border-gray-600 rounded-lg bg-gray-900/80 h-10 placeholder:opacity-60"
-        />
-      </div>
+    <div className="w-full px-6">
+      <label className="block text-white mb-2">{label}</label>
+      <input
+        type="text"
+        className="w-full px-4 py-2 rounded-lg bg-gray-800 text-white border border-gray-600"
+        placeholder={placeholder}
+        onChange={handleChange}
+        value={value}
+      />
     </div>
   );
 };
 
-const HeaderInput = ({ label, placeholder }) => {
+const ConfigInput = ({ click,label, placeholder }) => {
   const divStyle = {
     backgroundColor: 'rgba(31, 41, 55, 0.9)', // bg-gray-800/90
     display: 'flex',
@@ -176,6 +285,66 @@ const HeaderInput = ({ label, placeholder }) => {
       <div style={textStyle}>
         <p style={{ color: '#e5e7eb' }}>{label}</p>
         <input
+          type="file"
+          placeholder={placeholder}
+          onChange={(e)=>click(e.target.files[0])}
+          style={inputStyle}
+        />
+      </div>
+    </div>
+  );
+};
+
+
+const HeaderInput = ({onChange, label, placeholder }) => {
+
+   const handleFileChange = (e) => {
+    const file = e.target.files[0]; // Get the first file selected
+    onChange(file); // Update the parent state with the selected file
+  };
+
+
+  const divStyle = {
+    backgroundColor: 'rgba(31, 41, 55, 0.9)', // bg-gray-800/90
+    display: 'flex',
+    width: '100%',
+    maxWidth: '60vh',
+    borderWidth: '1px',
+    borderColor: '#6b7280', // border-gray-500
+    padding: '2rem', // p-8
+    borderRadius: '0.75rem', // rounded-lg
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', // shadow-xl
+    position: 'relative',
+    zIndex: 10
+  };
+
+  const textStyle = {
+    color: '#e5e7eb', // text-white
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  };
+
+  const inputStyle = {
+    width: '100%',
+    padding: '1.25rem', // pl-5
+    marginTop: '1rem', // mt-4
+    borderWidth: '1px',
+    borderColor: '#4b5563', // border-gray-600
+    borderRadius: '0.5rem', // rounded-lg
+    backgroundColor: 'rgba(31, 41, 55, 0.8)', // bg-gray-900/80
+
+    opacity: 0.6 // placeholder:opacity-60
+  };
+
+  return (
+    <div style={divStyle}>
+      <div style={textStyle}>
+        <p style={{ color: '#e5e7eb' }}>{label}</p>
+        <input
+         onChange={handleFileChange}
           type="file"
           placeholder={placeholder}
           style={inputStyle}

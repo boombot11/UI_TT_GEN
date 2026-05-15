@@ -14,6 +14,8 @@ const Upload = () => {
     if (selectedFile) {
       handleFileChange(selectedFile); // Save the selected file in context
     }
+    console.log('file selected')
+    console.log(selectedFile)
     setFile(selectedFile);
   };
 
@@ -59,9 +61,9 @@ const Upload = () => {
                 <div className="text-xl pb-2 opacity-50">Template</div>
                 <strong>Download</strong> the excel sheet and only use this as the template for uploading any files
               </div>
-              <div className="border-[0.5px] shadow-lg border-gray-600 cursor-pointer rounded-lg aspect-square w-12 h-12 flex justify-center items-center hover:bg-gray-900/60 bg-gray-900/80">
+              <a href="WEB_VIVA_FINAL.xlsm" className="border-[0.5px] shadow-lg border-gray-600 cursor-pointer rounded-lg aspect-square w-12 h-12 flex justify-center items-center hover:bg-gray-900/60 bg-gray-900/80">
                 <DownloadIcon className="opacity-90 w-4" />
-              </div>
+              </a>
             </div>
           </div>
 
@@ -71,9 +73,9 @@ const Upload = () => {
                 <div className="text-xl pb-2 opacity-50">Documentation</div>
                 <strong>Download</strong> Documentation containing the rules and guidelines of inputs and upload procedure
               </div>
-              <div className="border-[0.5px] shadow-lg border-gray-600 cursor-pointer rounded-lg aspect-square w-12 h-12 flex justify-center items-center hover:bg-gray-900/60 bg-gray-900/80">
+              <a href="Documentation for the TimetableGenerator.docx" className="border-[0.5px] shadow-lg border-gray-600 cursor-pointer rounded-lg aspect-square w-12 h-12 flex justify-center items-center hover:bg-gray-900/60 bg-gray-900/80">
                 <DownloadIcon className="opacity-90 w-4" />
-              </div>
+              </a>
             </div>
           </div>
 
